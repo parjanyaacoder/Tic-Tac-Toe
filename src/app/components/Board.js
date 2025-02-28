@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Square from "./Square"
 
 function checkWinner(squares) {
@@ -11,7 +11,7 @@ function checkWinner(squares) {
     return null
 }   
 
-export default function Board({ squares, xIsNext, onPlay }) {
+export default function Board({ squares, xIsNext, onPlay, playGame, onPlayCtaPress, enablePlayCta }) {
     const winner = checkWinner(squares)
     let status;
 
@@ -19,12 +19,23 @@ export default function Board({ squares, xIsNext, onPlay }) {
         status = "Winner: " + winner
     } else {
         if(squares.findIndex((val) => val === null ) === -1) 
-            status = "The game is draw"
+            {
+                status = "The game is draw"
+            }
         else 
         status = "Next player: " + (xIsNext ? "X" : "O" ) 
     }
 
+    useEffect(() => {
+        if(winner || squares.findIndex((val) => val === null ) === -1) {
+            enablePlayCta()
+        }
+    }, [winner, squares])
+
     function onSquareClick( value ) {
+
+        if(!playGame) return 
+
         const newSquares = squares.slice()
         
         if (newSquares[value] || checkWinner(squares)) return 
@@ -51,6 +62,7 @@ export default function Board({ squares, xIsNext, onPlay }) {
             <Square value={squares[7]} handleClick={() => onSquareClick(7)} />
             <Square value={squares[8]} handleClick={() => onSquareClick(8)} />
         </div>
+        <button className="border-1 my-4 rounded items-center bg-green-400 px-3 py-1 " onClick={onPlayCtaPress} disabled={playGame}  >{'Play'}</button>
     </>
     )
 }
